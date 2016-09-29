@@ -78,5 +78,6 @@
 	</build>
   <modules>
     <module>cap-04</module>
+    <module>cap-05</module>
   </modules>
 </project>
