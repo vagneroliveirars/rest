@@ -50,6 +50,7 @@ public class CervejaServlet extends HttpServlet {
 			
 			marshaller.marshal(cervejas, printWriter);
 		} catch (Exception e) {
+			e.printStackTrace();
 			resp.sendError(500, e.getMessage());
 		}
 	}

@@ -19,7 +19,7 @@ public class Estoque {
 				Cerveja.Tipo.LAGER);
 		
 		Cerveja segundaCerveja = new Cerveja("Erdinger Weissbier",
-				"Cerveja de trigo Alem√£", "Erdinger Weissbrau",
+				"Cerveja de trigo Alem„", "Erdinger Weissbrau",
 				Cerveja.Tipo.WEIZEN);
 		
 		this.cervejas.add(primeiraCerveja);
