@@ -1,7 +1,6 @@
 package br.com.geladaonline.servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.servlet.ServletException;
@@ -12,6 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 import br.com.geladaonline.model.Cerveja;
 import br.com.geladaonline.model.Estoque;
@@ -38,18 +41,48 @@ public class CervejaServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		
+		String acceptHeader = req.getHeader("Accept");
+		
+		if (acceptHeader == null || acceptHeader.contains("application/xml")) {
+			escreveXML(req, resp);
+		} else if (acceptHeader == null || acceptHeader.contains("application/json")) {
+			escreveJSON(req, resp);
+		} else {
+			// Accept header has received an unsupported value
+			resp.sendError(415);
+		}
+	}
+
+	private void escreveXML(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		Cervejas cervejas = new Cervejas();
+		cervejas.setCervejas(new ArrayList<Cerveja>(this.estoque.listarCervejas()));
+		
 		try {
-			Marshaller marshaller = context.createMarshaller();
-			
 			resp.setContentType("application/xml;charset=UTF-8");
+			Marshaller marshaller = context.createMarshaller();
+			marshaller.marshal(cervejas, resp.getWriter());
+		} catch (JAXBException e) {
+			// Internal server error
+			e.printStackTrace();
+			resp.sendError(500, e.getMessage());
+		}
+	}
+	
+	private void escreveJSON(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		Cervejas cervejas = new Cervejas();
+		cervejas.setCervejas(new ArrayList<Cerveja>(this.estoque.listarCervejas()));
+		
+		try {
+			resp.setContentType("application/json;charset=UTF-8");
 			
-			PrintWriter printWriter = resp.getWriter();
+			MappedNamespaceConvention con = new MappedNamespaceConvention();
 			
-			Cervejas cervejas = new Cervejas();
-			cervejas.setCervejas(new ArrayList<Cerveja>(this.estoque.listarCervejas()));
+			XMLStreamWriter xmlStreamWriter = new MappedXMLStreamWriter(con, resp.getWriter());
 			
-			marshaller.marshal(cervejas, printWriter);
-		} catch (Exception e) {
+			Marshaller marshaller = context.createMarshaller();
+			marshaller.marshal(cervejas, xmlStreamWriter);
+		} catch (JAXBException e) {
+			// Internal server error
 			e.printStackTrace();
 			resp.sendError(500, e.getMessage());
 		}
