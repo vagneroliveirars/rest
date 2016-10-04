@@ -2,6 +2,8 @@ package br.com.geladaonline.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is a stock of beers
@@ -11,7 +13,7 @@ import java.util.Collection;
  */
 public class Estoque {
 	
-	private Collection<Cerveja> cervejas = new ArrayList<Cerveja>();
+	private Map<String, Cerveja> cervejas = new HashMap<String, Cerveja>();
 	
 	public Estoque() {
 		Cerveja primeiraCerveja = new Cerveja("Stella Artois",
@@ -22,16 +24,20 @@ public class Estoque {
 				"Cerveja de trigo Alemã", "Erdinger Weissbrau",
 				Cerveja.Tipo.WEIZEN);
 		
-		this.cervejas.add(primeiraCerveja);
-		this.cervejas.add(segundaCerveja);
+		this.cervejas.put("Stella Artois", primeiraCerveja);
+		this.cervejas.put("Erdinger Weissbier", segundaCerveja);
 	}
 	
 	public Collection<Cerveja> listarCervejas() {
-		return new ArrayList<Cerveja>(this.cervejas);
+		return new ArrayList<Cerveja>(this.cervejas.values());
 	}
 	
 	public void adicionarCerveja(Cerveja cerveja) {
-		this.cervejas.add(cerveja);
+		this.cervejas.put(cerveja.getNome(), cerveja);
+	}
+	
+	public Cerveja recuperarCervejaPeloNome(String nome) {
+		return this.cervejas.get(nome);
 	}
 
 }
