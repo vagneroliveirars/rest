@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,9 +15,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.io.IOUtils;
+import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 import br.com.geladaonline.model.Cerveja;
@@ -75,21 +80,52 @@ public class CervejaServlet extends HttpServlet {
 		}
 		
 		try {
-			Unmarshaller unmarshaller = context.createUnmarshaller();
+			String tipoDeConteudo = req.getContentType();
 			
-			Cerveja cerveja = (Cerveja) unmarshaller.unmarshal(req.getInputStream());
-			cerveja.setNome(identificador);
-			estoque.adicionarCerveja(cerveja);
-			
-			String requestURI = req.getRequestURI();
-			resp.setHeader("Location", requestURI);
-			resp.setStatus(201);
-			
-			escreveXML(req, resp);
-		} catch (JAXBException e) {
+			if (tipoDeConteudo.startsWith("text/xml") || tipoDeConteudo.startsWith("application/xml")) {
+				Unmarshaller unmarshaller = context.createUnmarshaller();
+				
+				Cerveja cerveja = (Cerveja) unmarshaller.unmarshal(req.getInputStream());
+				cerveja.setNome(identificador);
+				estoque.adicionarCerveja(cerveja);
+				
+				String requestURI = req.getRequestURI();
+				resp.setHeader("Location", requestURI);
+				resp.setStatus(201);
+				
+				escreveXML(req, resp);
+			} else if (tipoDeConteudo.startsWith("application/json")) {
+				List<String> lines = IOUtils.readLines(req.getInputStream());
+				StringBuilder builder = new StringBuilder();
+				
+				for (String line : lines) {
+					builder.append(line);
+				}
+				
+				MappedNamespaceConvention con = new MappedNamespaceConvention();
+				JSONObject jsonObject = new JSONObject(builder.toString());
+				
+				XMLStreamReader xmlStreamReader = new MappedXMLStreamReader(jsonObject, con);
+				
+				Unmarshaller unmarshaller = context.createUnmarshaller();
+				
+				Cerveja cerveja = (Cerveja) unmarshaller.unmarshal(xmlStreamReader);
+				cerveja.setNome(identificador);
+				estoque.adicionarCerveja(cerveja);
+				
+				String requestURI = req.getRequestURI();
+				resp.setHeader("Location", requestURI);
+				resp.setStatus(201);
+				
+				escreveJSON(req, resp);
+			} else {
+				// unsupported format
+				resp.sendError(415);
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 			resp.sendError(500, e.getMessage());
-		}
+		} 
 	}
 
 	private void escreveXML(HttpServletRequest req, HttpServletResponse resp)
