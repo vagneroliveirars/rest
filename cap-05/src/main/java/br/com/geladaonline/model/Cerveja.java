@@ -1,17 +1,25 @@
 package br.com.geladaonline.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * This class represents a beer
  * 
  * @author vagner
  * 
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Cerveja {
 
 	private String nome;
 	private String descricao;
 	private String cervejaria;
 	private Tipo tipo;
+	
+	public Cerveja() {}
 
 	public Cerveja(String nome, String descricao, String cervejaria, Tipo tipo) {
 		this.nome = nome;

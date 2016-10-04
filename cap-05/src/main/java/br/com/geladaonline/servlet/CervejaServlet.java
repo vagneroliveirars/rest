@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
@@ -55,17 +56,56 @@ public class CervejaServlet extends HttpServlet {
 			resp.sendError(415);
 		}
 	}
+	
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		
+		String identificador = null;
+		
+		try {
+			identificador = obtemIdentificador(req);
+		} catch (RecursoSemIdentificadorException e) {
+			resp.sendError(400, e.getMessage());
+		}
+		
+		if (identificador != null && estoque.recuperarCervejaPeloNome(identificador) != null ) {
+			resp.sendError(409, "Já existe uma cerveja com esse nome");
+			return;
+		}
+		
+		try {
+			Unmarshaller unmarshaller = context.createUnmarshaller();
+			
+			Cerveja cerveja = (Cerveja) unmarshaller.unmarshal(req.getInputStream());
+			cerveja.setNome(identificador);
+			estoque.adicionarCerveja(cerveja);
+			
+			String requestURI = req.getRequestURI();
+			resp.setHeader("Location", requestURI);
+			resp.setStatus(201);
+			
+			escreveXML(req, resp);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+			resp.sendError(500, e.getMessage());
+		}
+	}
 
 	private void escreveXML(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		Cervejas cervejas = new Cervejas();
-		cervejas.setCervejas(new ArrayList<Cerveja>(this.estoque
-				.listarCervejas()));
+		
+		Object objetoAEscrever = localizaObjetoASerEnviado(req);
+		
+		if (objetoAEscrever == null) {
+			resp.sendError(404); // Object not found
+			return;
+		}
 
 		try {
 			resp.setContentType("application/xml;charset=UTF-8");
 			Marshaller marshaller = context.createMarshaller();
-			marshaller.marshal(cervejas, resp.getWriter());
+			marshaller.marshal(objetoAEscrever, resp.getWriter());
 		} catch (JAXBException e) {
 			// Internal server error
 			e.printStackTrace();
@@ -78,6 +118,10 @@ public class CervejaServlet extends HttpServlet {
 		
 		Object objetoAEscrever = localizaObjetoASerEnviado(req);
 		
+		if (objetoAEscrever == null) {
+			resp.sendError(404); // Object not found
+			return;
+		}
 
 		try {
 			resp.setContentType("application/json;charset=UTF-8");
@@ -88,7 +132,7 @@ public class CervejaServlet extends HttpServlet {
 					resp.getWriter());
 
 			Marshaller marshaller = context.createMarshaller();
-			//marshaller.marshal(cervejas, xmlStreamWriter);
+			marshaller.marshal(objetoAEscrever, xmlStreamWriter);
 		} catch (JAXBException e) {
 			// Internal server error
 			e.printStackTrace();
