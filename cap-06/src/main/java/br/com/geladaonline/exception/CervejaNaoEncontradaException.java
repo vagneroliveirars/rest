@@ -1,5 +1,11 @@
 package br.com.geladaonline.exception;
 
+/**
+ * Exception for not found beers
+ * 
+ * @author vagner
+ *
+ */
 public class CervejaNaoEncontradaException extends RuntimeException {
 
 	private static final long serialVersionUID = 7090096144041488400L;

@@ -1,7 +1,7 @@
 package br.com.geladaonline.services;
 
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -11,11 +11,12 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
 import br.com.geladaonline.exception.CervejaJaExisteException;
 import br.com.geladaonline.model.Cerveja;
@@ -35,21 +36,22 @@ public class CervejaService {
 
 	private static Estoque estoque = new Estoque();
 	
+	private static final int TAMANHO_PAGINA = 1;
+	
 	/**
-	 * Return all the beers
+	 * Returns all the beers with pagination
 	 * 
 	 * @return {@link Cervejas}
 	 */
 	@GET
-	public Cervejas listaTodasAsCervejas() {
-		Cervejas cervejas = new Cervejas();
-		cervejas.setCervejas(new ArrayList<>(estoque.listarCervejas()));
+	public Cervejas listaTodasAsCervejas(@QueryParam("pagina") int pagina) {
+		List<Cerveja> cervejas = estoque.listarCervejas(pagina, TAMANHO_PAGINA);
 		
-		return cervejas;
+		return new Cervejas(cervejas);
 	}
 	
 	/**
-	 * Search a beer by name
+	 * Returns a beer by name
 	 * 
 	 * @param nomeDaCerveja
 	 * @return {@link Cerveja}
@@ -66,6 +68,12 @@ public class CervejaService {
 		}
 	}
 	
+	/**
+	 * Creates a new beer
+	 * 
+	 * @param cerveja
+	 * @return
+	 */
 	@POST
 	public Response criarCerveja(Cerveja cerveja) {
 		try {
@@ -79,6 +87,12 @@ public class CervejaService {
 		return Response.created(uri).entity(cerveja).build();
 	}
 	
+	/**
+	 * Updates a beer
+	 * 
+	 * @param nome
+	 * @param cerveja
+	 */
 	@PUT
 	@Path("{nome}")
 	public void atualizarCerveja(@PathParam("nome") String nome, Cerveja cerveja) {
@@ -87,6 +101,11 @@ public class CervejaService {
 		estoque.atualizarCerveja(cerveja);
 	}
 	
+	/**
+	 * Deletes a beer
+	 * 
+	 * @param nome
+	 */
 	@DELETE
 	@Path("{nome}")
 	public void apagarCerveja(@PathParam("nome") String nome) {
