@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.geladaonline.exception.CervejaJaExisteException;
+
 /**
  * This class is a stock of beers
  * 
@@ -33,6 +35,10 @@ public class Estoque {
 	}
 	
 	public void adicionarCerveja(Cerveja cerveja) {
+		if (this.cervejas.containsKey(cerveja.getNome())) {
+			throw new CervejaJaExisteException();
+		}
+		
 		this.cervejas.put(cerveja.getNome(), cerveja);
 	}
 	
