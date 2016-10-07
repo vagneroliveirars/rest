@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.geladaonline.exception.CervejaJaExisteException;
+import br.com.geladaonline.exception.CervejaNaoEncontradaException;
 
 /**
  * This class is a stock of beers
@@ -44,6 +45,17 @@ public class Estoque {
 	
 	public Cerveja recuperarCervejaPeloNome(String nome) {
 		return this.cervejas.get(nome);
+	}
+	
+	public void atualizarCerveja(Cerveja cerveja) {
+		if (!this.cervejas.containsKey(cerveja.getNome())) {
+			throw new CervejaNaoEncontradaException();
+		}
+		cervejas.put(cerveja.getNome(), cerveja);
+	}
+	
+	public void apagarCerveja(String nomeCerveja) {
+		this.cervejas.remove(nomeCerveja);
 	}
 
 }
