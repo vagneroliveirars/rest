@@ -1,8 +1,15 @@
 package br.com.geladaonline.services;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -13,6 +20,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -30,13 +38,19 @@ import br.com.geladaonline.model.rest.Cervejas;
  *
  */
 @Path("/cervejas")
-@Consumes({MediaType.APPLICATION_XML})
-@Produces({MediaType.APPLICATION_XML})
+@Consumes({MediaType.APPLICATION_XML, MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
+@Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
 public class CervejaService {
 
 	private static Estoque estoque = new Estoque();
 	
 	private static final int TAMANHO_PAGINA = 1;
+	private static Map<String, String> EXTENSOES;
+	
+	static {
+		EXTENSOES = new HashMap<String, String>();
+		EXTENSOES.put("image/jpg", ".jpg");
+	}
 	
 	/**
 	 * Returns all the beers with pagination
@@ -110,6 +124,42 @@ public class CervejaService {
 	@Path("{nome}")
 	public void apagarCerveja(@PathParam("nome") String nome) {
 		estoque.apagarCerveja(nome);
+	}
+	
+	@GET
+	@Path("{nome}")
+	@Produces("image/*")
+	public Response recuperaImagem(@PathParam("nome") String nomeDaCerveja) throws IOException {
+		InputStream is = CervejaService.class.getResourceAsStream("/" + nomeDaCerveja + ".jpg");
+		
+		if (is == null) {
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
+		
+		byte[] dados = new byte[is.available()];
+		is.read(dados);
+		is.close();
+		
+		return Response.ok(dados).type("image/jpg").build();
+	}
+	
+	@POST
+	@Path("{nome}")
+	@Consumes("image/*")
+	public Response criaImagem(@PathParam("nome") String nomeDaImagem,
+			@Context HttpServletRequest req, byte[] dados) 
+		throws IOException, InterruptedException {
+
+		String userHome = System.getProperty("user.home");
+		String mimeType = req.getContentType();
+		FileOutputStream fos = new FileOutputStream(userHome + File.separator
+				+ nomeDaImagem + EXTENSOES.get(mimeType));
+		
+		fos.write(dados);
+		fos.flush();
+		fos.close();
+		
+		return Response.ok().build();
 	}
 	
 }
