@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
 		<title>Cervejaria REST</title>
 		<script type="text/javascript" src="jquery-1.10.2.min.js"></script>
 		<script type="text/javascript">
@@ -11,12 +11,48 @@
 	  				url : host + 'cervejas',
 	  				type : 'GET',
 	  				success : function(data) {
-	  					alert("Dados retornados com sucesso");
+	  					$('#grid tr:gt(0)').remove();
+	  					if ($.isArray(data.cervejas.link)) {
+	  					   for ( var i = 0; i < data.cervejas.link.length; i++) {
+	  					      var link = data.cervejas.link[i]['@href'];
+	  					      segueLinkCerveja(link);
+	  					   }
+	  					} else {
+	  					   var link = data.cervejas.link['@href'];
+	  					   segueLinkCerveja(link);
+	  					}
+					
 	  				},
 	  				error: function(data) {
 	  					alert("Erro na invocação");
 	  				}
 	  			});
+	  		}      
+	  		
+	  		
+	  		function segueLinkCerveja(link) {
+	  		   $.ajax({
+	  		      url : host + link,
+	  		      type : 'GET',
+	  		      success : function(data) {
+	  		         adicionaCervejaNovaAoGrid(data.cerveja);
+	  		      },
+	  		      error : function(data) {
+	  		         alert("Ocorreu um erro");
+	  		      }
+	  		   });
+	  		}
+	  		
+	  		function adicionaCervejaNovaAoGrid(cerveja) {
+	  		   var data = "<tr>"
+	  		      + "<td>" + cerveja.nome + "</td>"
+	  		      + "<td>" + cerveja.cervejaria + "</td>"
+	  		      + "<td>" + cerveja.descricao + "</td>"
+	  		      + "<td>" + cerveja.tipo + "</td>"
+	  		      + "<td><input type=\"button\" value=\"Apagar\" "
+	  		      + "onclick=\"apagaCerveja('" + cerveja.nome + "');\" /></td>" 
+	  		      + "</tr>";
+	  		   $("#grid").append(data);
 	  		}
 		</script>
 	</head>
