@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+		<title>Cervejaria REST</title>
+		<script type="text/javascript" src="jquery-1.10.2.min.js"></script>
+		<script type="text/javascript">
+			host = "http://localhost:8080/cervejaria/services/";
+			function listarCervejas() {
+	  			$.ajax({
+	  				url : host + 'cervejas',
+	  				type : 'GET',
+	  				success : function(data) {
+	  					alert("Dados retornados com sucesso");
+	  				},
+	  				error: function(data) {
+	  					alert("Erro na invocação");
+	  				}
+	  			});
+	  		}
+		</script>
+	</head>
+	<body>
+		<fieldset>
+			<legend>Listagem de	cervejas</legend>
+			<table id="grid">
+				<thead>
+					<tr>
+						<th>Nome</th>
+						<th>Cervejaria</th>
+						<th>Descrição</th>
+						<th>Tipo</th>
+						<th>Opções</th>
+					</tr>
+				</thead>
+				<tr>
+					<td	colspan="5">Carregando...</td>
+				</tr>
+			</table>	
+		</fieldset>
+		
+		<script type="text/javascript">
+      		listarCervejas();
+      	</script>
+	</body>
+</html>
