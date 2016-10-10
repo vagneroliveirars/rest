@@ -71,7 +71,7 @@
 		  		    	listarCervejas();
 		  		    },
 		  		    error : function(data) {
-		  		    	alert("Ocorreu um erro");
+		  		    	alert("Ocorreu um erro: " + data.status + " " + data.statusText);
 		  			}
 				});
 			}
@@ -84,7 +84,7 @@
 		  		    	listarCervejas();
 		  		    },
 		  		    error : function(data) {
-		  		    	alert("Ocorreu um erro");
+		  		    	alert("Ocorreu um erro: " + data.status + " " + data.statusText);
 		  			}
 				});
 			}
