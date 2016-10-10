@@ -4,8 +4,10 @@
 		<meta charset="UTF-8">
 		<title>Cervejaria REST</title>
 		<script type="text/javascript" src="jquery-1.10.2.min.js"></script>
+		<script type="text/javascript" src="jquery.serializejson.js"></script>
 		<script type="text/javascript">
 			host = "http://localhost:8080/cervejaria/services/";
+			
 			function listarCervejas() {
 	  			$.ajax({
 	  				url : host + 'cervejas',
@@ -28,7 +30,6 @@
 	  				}
 	  			});
 	  		}      
-	  		
 	  		
 	  		function segueLinkCerveja(link) {
 	  		   $.ajax({
@@ -54,9 +55,53 @@
 	  		      + "</tr>";
 	  		   $("#grid").append(data);
 	  		}
+
+	  		function adicionaCerveja() {
+				var data = $("#criarCervejaForm").serializeJSON();
+				data = "{\"cerveja\":" + JSON.stringify(data) + "}";
+
+				$.ajax({
+					url : host + 'cervejas',
+		  		    type : 'POST',
+		  		    contentType: 'application/json',
+		  		    data: data,
+		  		    success : function(data) {
+		  		    	alert("Incluído com sucesso");
+		  		    	$("#criarCervejaForm")[0].reset();
+		  		    	listarCervejas();
+		  		    },
+		  		    error : function(data) {
+		  		    	alert("Ocorreu um erro");
+		  			}
+				});
+			}
 		</script>
 	</head>
 	<body>
+		<fieldset>
+			<legend>Criar nova cerveja</legend>
+			<form id="criarCervejaForm">
+				<label>Nome</label> 
+				<input type="text" name="nome" /> 
+				<br /> 
+				<label>Cervejaria</label>
+				<input type="text" name="cervejaria" /> 
+				<br /> 
+				<label>Descrição</label>
+				<input type="text" name="descricao" /> 
+				<br /> 
+				<label>Tipo</label> 
+				<select name="tipo">
+					<option value="LAGER" selected="selected">Lager</option>
+					<option value="PILSEN">Pilsen</option>
+					<option value="BOCK">Bock</option>
+					<option value="WEIZEN">Weizen</option>
+				</select> 
+				<input type="button" value="Criar" onclick="adicionaCerveja();" />
+	
+			</form>
+		</fieldset>
+	
 		<fieldset>
 			<legend>Listagem de	cervejas</legend>
 			<table id="grid">
