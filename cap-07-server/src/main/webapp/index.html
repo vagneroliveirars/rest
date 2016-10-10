@@ -75,6 +75,19 @@
 		  			}
 				});
 			}
+
+			function apagaCerveja(id) {
+				$.ajax({
+					url : host + 'cervejas/' + id,
+		  		    type : 'DELETE',
+		  		    success : function(data) {
+		  		    	listarCervejas();
+		  		    },
+		  		    error : function(data) {
+		  		    	alert("Ocorreu um erro");
+		  			}
+				});
+			}
 		</script>
 	</head>
 	<body>
