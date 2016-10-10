@@ -126,6 +126,13 @@ public class CervejaService {
 		estoque.apagarCerveja(nome);
 	}
 	
+	/**
+	 * Returns an image by beer name
+	 * 
+	 * @param nomeDaCerveja
+	 * @return Response with image binary data
+	 * @throws IOException
+	 */
 	@GET
 	@Path("{nome}")
 	@Produces("image/*")
@@ -143,6 +150,16 @@ public class CervejaService {
 		return Response.ok(dados).type("image/jpg").build();
 	}
 	
+	/**
+	 * Creates a new image in the user home directory
+	 * 
+	 * @param nomeDaImagem
+	 * @param req
+	 * @param dados
+	 * @return Response
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	@POST
 	@Path("{nome}")
 	@Consumes("image/*")
