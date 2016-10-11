@@ -81,5 +81,6 @@
     <module>cap-05</module>
     <module>cap-06</module>
     <module>cap-07-server</module>
+    <module>cap-07-jaxrs</module>
   </modules>
 </project>
