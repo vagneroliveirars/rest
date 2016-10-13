@@ -21,6 +21,7 @@ public class ApplicationJAXRS extends Application {
 	public Map<String, Object> getProperties() {
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("jersey.config.server.provider.packages", "br.com.geladaonline.services");
+		properties.put("jersey.config.server.wadl.generatorConfig", WADLConfig.class.getCanonicalName());
 		return properties;
 	}
 	
