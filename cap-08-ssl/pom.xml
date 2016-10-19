@@ -55,6 +55,7 @@
 					<loginServices>
 						<loginService implementation="org.eclipse.jetty.security.HashLoginService">
 							<name>Default</name>
+							<config>${basedir}/src/main/config/realm.properties</config>
 						</loginService>
 					</loginServices>
 					<connectors>
