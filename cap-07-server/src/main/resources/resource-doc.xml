@@ -8,7 +8,7 @@
 			</commentText>
 			<methodDocs>
 				<methodDoc>
-					<methodName>listeTodasAsCervejas</methodName>
+					<methodName>listaTodasAsCervejas</methodName>
 					<commentText><![CDATA[Lista as cervejas catalogadas]]></commentText>
 
 					<responseDoc>

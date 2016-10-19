@@ -1,5 +1,9 @@
 package br.com.geladaonline.services;
 
+import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.jaxrs.listing.SwaggerSerializers;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -16,6 +20,29 @@ import org.glassfish.jersey.jettison.JettisonFeature;
  *
  */
 public class ApplicationJAXRS extends Application {
+	
+	public ApplicationJAXRS() {
+		BeanConfig beanConfig = new BeanConfig();
+		beanConfig.setTitle("API cervejaria");
+		beanConfig.setDescription("This API manages all the beers");
+		beanConfig.setVersion("0.0.1");
+		beanConfig.setHost("localhost:8080");
+		beanConfig.setBasePath("/cervejaria/services");
+		beanConfig.setSchemes(new String[] { "http" });
+		beanConfig.setResourcePackage("br.com.geladaonline.services");
+		beanConfig.setScan(true);
+	}
+	
+	@Override
+	public Set<Class<?>> getClasses() {
+		Set<Class<?>> resources = new HashSet<>();
+
+		// Swagger classes
+		resources.add(ApiListingResource.class);
+		resources.add(SwaggerSerializers.class);
+		
+		return resources;
+	}
 
 	@Override
 	public Map<String, Object> getProperties() {
