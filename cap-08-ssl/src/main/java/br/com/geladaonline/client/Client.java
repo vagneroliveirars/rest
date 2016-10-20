@@ -13,11 +13,9 @@ import br.com.geladaonline.model.rest.Cervejas;
 public class Client {
 
 	public static void main(String[] args) {
-		String baseDir = "/home/vagner/git/rest/cap-08-ssl/";
-		
 		SslConfigurator sslConfigurator = SslConfigurator
 				.newInstance()
-				.trustStoreFile(baseDir + "src/main/config/server.keystore")
+				.trustStoreFile(System.getProperty("user.dir") + "/src/main/java/br/com/geladaonline/client/server.keystore")
 				.trustStorePassword("cervejaria");
 		
 		SSLContext context = sslConfigurator.createSSLContext();
