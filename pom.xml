@@ -86,5 +86,6 @@
     <module>cap-08-ssl</module>
     <module>cap-08-oauth</module>
     <module>cap-09-buscaexemplos</module>
+    <module>cap-09-funcoes</module>
   </modules>
 </project>
