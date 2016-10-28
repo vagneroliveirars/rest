@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.jettison.JettisonFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 /**
  * This class sets up the JAX-RS application
@@ -28,6 +29,7 @@ public class ApplicationJAXRS extends Application {
 	public Set<Object> getSingletons() {
 		Set<Object> singletons = new HashSet<Object>();
 		singletons.add(new JettisonFeature());
+		singletons.add(new MultiPartFeature());
 		return singletons;
 	}
 	
