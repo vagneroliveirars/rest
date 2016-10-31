@@ -87,5 +87,6 @@
     <module>cap-08-oauth</module>
     <module>cap-09-buscaexemplos</module>
     <module>cap-09-funcoes</module>
+    <module>cap-09-async</module>
   </modules>
 </project>
