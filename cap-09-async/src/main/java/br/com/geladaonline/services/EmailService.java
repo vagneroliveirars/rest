@@ -1,21 +1,19 @@
 package br.com.geladaonline.services;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 
-import org.glassfish.jersey.media.multipart.BodyPart;
-import org.glassfish.jersey.media.multipart.MultiPart;
-
-import br.com.geladaonline.model.Anexo;
 import br.com.geladaonline.model.Email;
 
 /**
- * This class is a REST service to send e-mails
+ * This class is an asynchronous REST service to retrieve e-mails
  * 
  * @author vagner
  *
@@ -23,70 +21,31 @@ import br.com.geladaonline.model.Email;
 @Path("/email")
 public class EmailService {
 	
-	/**
-	 * Sends a simple e-mail without attachments
-	 * 
-	 * @param para
-	 * @param comCopia
-	 * @param comCopiaOculta
-	 * @param assunto
-	 * @param mensagem
-	 * @param httpHeaders
-	 */
-	@POST
-	@Consumes({MediaType.TEXT_PLAIN, MediaType.TEXT_HTML})
-	public void enviarEmailSimples(@HeaderParam("To") String para,
-			@HeaderParam("Cc") String comCopia,
-			@HeaderParam("Bcc") String comCopiaOculta, 
-			@HeaderParam("Subject") String assunto,
-			String mensagem,
-			@Context HttpHeaders httpHeaders) {
-
-		Email email = new Email()
-			.withDestinatario(para)
-			.withComCopia(comCopia)
-			.withComCopiaOculta(comCopiaOculta)
-			.withAssunto(assunto)
-			.withMensagem(mensagem, httpHeaders.getMediaType().toString());
-		email.enviar();
+	private static ExecutorService executorService;
 	
+	static {
+		executorService = Executors.newFixedThreadPool(20);
 	}
 	
-	/**
-	 * Sends an e-mail with attachments
-	 * 
-	 * @param para
-	 * @param comCopia
-	 * @param comCopiaOculta
-	 * @param assunto
-	 * @param multiPart
-	 */
-	@POST
-	@Consumes("multipart/mixed")
-	public void enviarEmailAnexos(
-			@HeaderParam("To") String para,
-			@HeaderParam("Cc") String comCopia,
-			@HeaderParam("Bcc") String comCopiaOculta, 
-			@HeaderParam("Subject") String assunto,
-			MultiPart multiPart) {
-		
-		Email email = new Email();
-		email.withDestinatario(para)
-			.withAssunto(assunto)
-			.withComCopia(comCopia)
-			.withComCopiaOculta(comCopiaOculta);
-		for (BodyPart bodyPart : multiPart.getBodyParts()) {
-			String mediaType = bodyPart.getMediaType().toString();
-			if (mediaType.startsWith("text/plain") || mediaType.startsWith("text/html")) {
-				email = email.withMensagem(bodyPart.getEntityAs(String.class), mediaType);
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	public void recuperarEmails(@Suspended final AsyncResponse asyncResponse) {
+		executorService.execute(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(20 * 1000); //20 segundos
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} 
+				
+				Email email = new Email()
+					.withAssunto("Email recebido");
+				
+				asyncResponse.resume(email);
 			}
-			else {
-				Anexo anexo = new Anexo(bodyPart.getEntityAs(byte[].class), bodyPart.getMediaType().toString());
-				email = email.withAnexo(anexo);
-			}
-		}
-		
-		email.enviar();
+		});
 	}
 
 }
