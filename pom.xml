@@ -90,5 +90,6 @@
     <module>cap-09-async</module>
     <module>cap-09-interceptacao</module>
     <module>cap-09-testes</module>
+    <module>cap-09-dados_customizados</module>
   </modules>
 </project>
